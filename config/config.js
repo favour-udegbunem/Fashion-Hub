@@ -46,6 +46,11 @@ const config = {
     dialect: process.env.DB_DIALECT,
     dialectModule: mysql2,
     logging: false,
+    dialectOptions: {
+      ssl: {
+        require: true,
+      },
+    },
   },
 };
 
