@@ -10,10 +10,10 @@ import EventModel from "./event.js";
 import IncomeModel from "./income.js";
 import ExpenseModel from "./expense.js";
 import SettingModel from "./setting.js";
-import DressCategoryModel from "./dressCategory.js";
+import DressCategoryModel from "./dresscategory.js";
 import CategoryModel from "./category.js";
-import SubCategoryModel from "./subCategory.js";
-import UserSelectionModel from "./userSelection.js";
+import SubCategoryModel from "./subcategory.js";
+import UserSelectionModel from "./userselection.js";
 import UserProfileModel from "./userprofile.js";
 import CalendarEventModel from "./calendarevent.js";
 
