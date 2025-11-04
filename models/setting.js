@@ -31,7 +31,7 @@ export default (sequelize) => {
 
   Setting.init(
     {
-      userId: DataTypes.INTEGER,
+      userId: DataTypes.UUID,
       logoUrl: DataTypes.STRING,
       businessName: DataTypes.STRING,
       ownerName: DataTypes.STRING,

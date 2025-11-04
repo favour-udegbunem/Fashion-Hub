@@ -6,7 +6,6 @@ export default (sequelize) => {
       User.hasMany(models.Order, { foreignKey: "userId", onDelete: "CASCADE" });
       User.hasMany(models.Measurement, { foreignKey: "userId", onDelete: "CASCADE" });
       User.hasMany(models.CatalogItem, { foreignKey: "userId", onDelete: "CASCADE" });
-      User.hasMany(models.Event, { foreignKey: "userId", onDelete: "CASCADE" });
       User.hasMany(models.Income, { foreignKey: "userId", onDelete: "CASCADE" });
       User.hasMany(models.Expense, { foreignKey: "userId", onDelete: "CASCADE" });
       User.hasOne(models.Setting, { foreignKey: "userId", onDelete: "CASCADE" });
