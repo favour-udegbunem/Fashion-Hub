@@ -22,6 +22,9 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
+app.get("/", (req, res) => {
+  res.send("🎉 Welcome to Fashion Hub Backend! It is Live and Running Smoothly 🚀");
+});
 app.use("/api/auth", authRoutes);
 app.use("/api", userSelectionRoutes);
 app.use("/api/categories", categoryRoutes);
