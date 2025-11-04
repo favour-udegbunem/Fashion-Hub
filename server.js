@@ -38,11 +38,11 @@ const PORT = process.env.PORT || 5000;
 
 
 // Sync models if needed (optional — for dev only)
-await sequelize.drop();
-console.log("✅ All tables dropped successfully");
+// await sequelize.drop();
+// console.log("✅ All tables dropped successfully");
 
-await sequelize.sync({ force: true });
-console.log("✅ Database synced successfully");
+// await sequelize.sync({ force: true });
+// console.log("✅ Database synced successfully");
 
 // Test DB connection and start server
 sequelize

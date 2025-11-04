@@ -1,10 +1,10 @@
 import db from "../models/index.js";
-import subCategory from "../models/subCategory.js";
+import subcategory from "../models/subcategory.js";
 const { UserSelection, SubCategory } = db;
 
 export const createUserSelection = async (req, res) => {
   try {
-    const { dressCategoryId, categoryId, subCategoryId } = req.body;
+    const { dressCategoryId, categoryId, subcategoryId } = req.body;
     const userId = req.user.id; // ✅ from JWT
 
     // 🔍 Check existing before inserting
