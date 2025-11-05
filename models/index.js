@@ -17,16 +17,23 @@ import UserProfileModel from "./userprofile.js";
 import CalendarEventModel from "./calendarevent.js";
 
 // Initialize Sequelize
-const sequelize = new Sequelize(process.env.DB_URL, {
-  dialect: "mysql",
-  dialectOptions: {
-    ssl: {
-      require: true,
-      rejectUnauthorized: false,
+const sequelize = new Sequelize(
+  process.env.DB_NAME,
+  process.env.DB_USER,
+  process.env.DB_PASSWORD,
+  {
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    dialect: process.env.DB_DIALECT || "mysql",
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false,
+      },
     },
-  },
-  logging: false,
-});
+    logging: false,
+  }
+);
 
 // Initialize models
 const User = UserModel(sequelize, DataTypes);

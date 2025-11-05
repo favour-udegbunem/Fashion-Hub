@@ -22,7 +22,7 @@ export const signup = async (req, res) => {
       email,
       whatsappNumber,
       businessName,
-      role: role || "tailor",
+      role: role || "Tailor",
       password: hashedPassword,
       whatsappLink,
     });
