@@ -40,18 +40,25 @@ app.use("/api/user", userRoutes)
 const PORT = process.env.PORT || 5000;
 
 
-// Sync models if needed (optional — for dev only)
-// await sequelize.drop();
-// console.log("✅ All tables dropped successfully");
+(async () => {
+  try {
+    await db.sequelize.authenticate();
+    console.log("✅ Connected to TiDB Cloud successfully!");
 
-// await sequelize.sync({ force: true });
-// console.log("✅ Database synced successfully");
+    // Sync models without dropping tables
+    await db.sequelize.sync({ alter: true });
 
-// Test DB connection and start server
-sequelize
-  .authenticate()
-  .then(() => {
-    console.log("✅ Database connected successfully");
-    app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
-  })
-  .catch((err) => console.error("❌ Database connection error:", err));
+    // Start server
+    app.listen(process.env.PORT || 4000, () =>
+      console.log(`🚀 Server running on port ${process.env.PORT || 4000}`)
+    );
+  } catch (error) {
+    console.error("❌ Database connection failed:", error);
+  }
+})();
+
+if (process.env.NODE_ENV === "production") {
+  import("./scripts/seedCategories.js")
+    .then(() => console.log("✅ Seed categories run successfully"))
+    .catch((err) => console.error("❌ Error running seed:", err));
+}
