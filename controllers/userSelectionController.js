@@ -1,5 +1,5 @@
 import db from "../models/index.js";
-import subcategory from "../models/subcategory.js";
+// import SubCategory from "../models/subcategory.js";
 const { UserSelection, SubCategory } = db;
 
 export const createUserSelection = async (req, res) => {
