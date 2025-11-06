@@ -45,18 +45,26 @@ const PORT = process.env.PORT || 5000;
     await db.sequelize.authenticate();
     console.log("✅ Connected to TiDB Cloud successfully!");
 
-    // Sync models without dropping tables
-    await db.sequelize.sync({ alter: true });
+    // 🧠 Only run `alter: true` in development
+    if (process.env.NODE_ENV === "development") {
+      await db.sequelize.sync({ alter: true });
+      console.log("🛠️ Database synced (development mode)");
+    } else {
+      // In production, just ensure connection — don't alter schema
+      await db.sequelize.sync();
+      console.log("🚀 Database sync skipped (production mode)");
+    }
 
     // Start server
-    app.listen(process.env.PORT || 4000, () =>
-      console.log(`🚀 Server running on port ${process.env.PORT || 4000}`)
+    app.listen(PORT, () =>
+      console.log(`🚀 Server running on port ${PORT}`)
     );
   } catch (error) {
     console.error("❌ Database connection failed:", error);
   }
 })();
 
+// ✅ Only run seeders automatically in production (optional)
 if (process.env.NODE_ENV === "production") {
   import("./scripts/seedCategories.js")
     .then(() => console.log("✅ Seed categories run successfully"))
