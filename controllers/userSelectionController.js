@@ -37,32 +37,70 @@ export const createUserSelection = async (req, res) => {
   }
 };
 
+// export const getAllUserSelections = async (req, res) => {
+//   try {
+//     const userId = req.user.id; // ✅ from JWT
+
+//     // Fetch all selections by userId
+//     const selections = await UserSelection.findAll({
+//       where: { userId },
+//       include: [
+//         {
+//           model: SubCategory,
+//           as: "SubCategory",
+//           attributes: ["name"], // ✅ only get the name
+//         },
+//       ],
+//       order: [["createdAt", "DESC"]], // ✅ this is correct
+//     });
+
+//     if (!selections || selections.length === 0) {
+//       return res.status(404).json({
+//         message: "No selections found for this user",
+//       });
+//     }
+
+//     res.status(200).json({
+//       message: "User selections retrieved successfully",
+//       selections,
+//     });
+//   } catch (error) {
+//     console.error("Error fetching user selections:", error);
+//     res.status(500).json({
+//       message: "Internal server error",
+//       error: error.message,
+//     });
+//   }
+// };
+
 export const getAllUserSelections = async (req, res) => {
   try {
-    const userId = req.user.id; // ✅ from JWT
+    const userId = req.user.id;
 
-    // Fetch all selections by userId
     const selections = await UserSelection.findAll({
       where: { userId },
       include: [
         {
           model: SubCategory,
           as: "SubCategory",
-          attributes: ["name"], // ✅ only get the name
+          attributes: ["name"],
         },
       ],
-      order: [["createdAt", "DESC"]], // ✅ this is correct
+      order: [["createdAt", "DESC"]],
     });
 
     if (!selections || selections.length === 0) {
-      return res.status(404).json({
+      return res.status(200).json({
         message: "No selections found for this user",
+        categories: [], // ✅ matches frontend
+        selected: [],   // optional, if frontend uses this
       });
     }
 
     res.status(200).json({
       message: "User selections retrieved successfully",
-      selections,
+      categories: selections, // ✅ rename to categories
+      selected: selections.map((s) => s.subCategoryId), // optional
     });
   } catch (error) {
     console.error("Error fetching user selections:", error);
