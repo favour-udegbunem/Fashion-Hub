@@ -80,12 +80,10 @@ export const login = async (req, res) => {
   }
 };
 
-/* ---------------------- GET LOGGED-IN USER ---------------------- */
+/* ---------------------- GET CURRENT LOGGED-IN USER ---------------------- */
 export const getUser = async (req, res) => {
   try {
-    // The auth middleware must have already decoded the JWT and set req.user
-    const userId = req.user?.id;
-
+    const userId = req.user?.id; // ✅ Comes from decoded JWT in middleware
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized: No user ID found" });
     }
@@ -100,14 +98,13 @@ export const getUser = async (req, res) => {
 
     res.status(200).json({
       message: `Welcome back, ${user.businessName || user.fullName}!`,
-      user
+      user,
     });
   } catch (error) {
     console.error("Get user error:", error);
     res.status(500).json({ message: "Failed to fetch user", error: error.message });
   }
 };
-
 
 /* ---------------------- UPDATE USER ---------------------- */
 export const updateUser = async (req, res) => {
