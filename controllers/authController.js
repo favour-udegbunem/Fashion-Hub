@@ -80,6 +80,35 @@ export const login = async (req, res) => {
   }
 };
 
+/* ---------------------- GET LOGGED-IN USER ---------------------- */
+export const getUser = async (req, res) => {
+  try {
+    // The auth middleware must have already decoded the JWT and set req.user
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized: No user ID found" });
+    }
+
+    const user = await User.findByPk(userId, {
+      attributes: ["id", "fullName", "email", "businessName", "role", "whatsappLink"]
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      message: `Welcome back, ${user.businessName || user.fullName}!`,
+      user
+    });
+  } catch (error) {
+    console.error("Get user error:", error);
+    res.status(500).json({ message: "Failed to fetch user", error: error.message });
+  }
+};
+
+
 /* ---------------------- UPDATE USER ---------------------- */
 export const updateUser = async (req, res) => {
   try {
