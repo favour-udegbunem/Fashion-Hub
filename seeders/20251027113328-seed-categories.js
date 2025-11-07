@@ -46,12 +46,22 @@ export async function up(queryInterface, Sequelize) {
     ["Mens Top", ["T-shirts", "Polo Shirts", "Dress shirt", "Kaftan Tops", "Casual Shirt", "Traditional Tops"]],
     // MEN’S BOTTOM
     ["Mens Bottom", ["Trousers", "Jeans", "Chinos", "Short", "Native Trouser", "Sokoto"]],
+    // MEN'S SUTE'S AND FORMAL
+    ["Mens Suits & Formal", ["Business Suites", "Tuxedos", "Agbada", "Senator Wear", "Dashiki Sets"]],
+    // MENS TRADITIONAL WEAR
+    ["Mens Traditional Wear", ["Kaftans", "Buba & Sokoto", "Native Attire", "Aso Ebi(Men)", ]],
     // WOMEN’S DRESSES
     ["Women Dresses", ["Evening Gowns", "Ankara Gowns", "Casual Dresses", "Maxi Dresses", "Midi Dresses", "Cocktail Dresses", "Shift Dresses"]],
     // WOMEN’S TOP
     ["Womens Top", ["Blouses", "Crop Top", "Peplum Tops", "Off Shoulder Tops", "Camisoles", "Tunic"]],
+    //WOMENS BOTTOM
+    ["Womens Bottom", ["Skirts", "Trousers", "Pallazo Pants", "Pencil Skirts", "Ankara Skirts"]],
+    //WOMENS FORMAL & CORPORATE
+    ["Womens Formal & Corporate", ["Blazers", "Corporate Suits", "Office Wear", "Pencil Dresses",]],
     // WOMEN’S TRADITIONAL WEAR
     ["Womens Traditional Wear", ["Iro & Buba", "Kaftans", "Wrapper & Blouse", "Aso Ebi", "Traditional Gowns", "Ankara Styles"]],
+    // WOMENS BRIDAL & OCCASSION
+    ["Womens Bridal & Occassion", ["Wedding Gowns", "Bridesmaid  Dresses", "Prom Dresses", "Party Dresses"]],
   ];
 
   const subCategories = subCategoriesData.flatMap(([categoryName, subNames]) =>
