@@ -4,6 +4,7 @@ import {
   getAllOrders,
   getOrderById,
   updateOrder,
+  updateOrderStatus,
   deleteOrder,
   getAllOrdersByDressType,
 } from "../controllers/orderController.js";
@@ -15,6 +16,7 @@ const router = express.Router();
 router.post("/createOrder", verifyToken, createOrder);
 router.get("/getAllOrders", verifyToken, getAllOrders);
 router.get("/getAllOrdersByDressType", verifyToken, getAllOrdersByDressType);
+router.put("/updateOrderStatus", verifyToken, updateOrderStatus)
 router.get("/:id", verifyToken, getOrderById);
 router.put("/:id", verifyToken, updateOrder);
 router.delete("/:id", verifyToken, deleteOrder);
