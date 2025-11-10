@@ -111,7 +111,7 @@ app.use("/api", userprofile);
 app.use("/api", orderRoutes);
 app.use("/api/measurements", measurementRoutes);
 app.use("/api/catalog", catalogRoutes);
-app.use("/api", calendarRoutes);
+app.use("/api/events", calendarRoutes);
 app.use("/api/income", incomeRoutes);
 app.use("/api/expense", expenseRoute);
 app.use("/api/user", userRoutes);
