@@ -20,7 +20,7 @@ await queryInterface.createTable('CalendarEvents', {
     allowNull: false
   },
   eventType: {
-    type: Sequelize.ENUM('Fitting', 'Delivery', 'Measurement'),
+    type: Sequelize.ENUM('Fitting', 'Delivery', 'Measurement', 'Order'),
     allowNull: false
   },
   eventDate: {
