@@ -48,6 +48,7 @@ const { User } = db;
 // };
 
 /* ---------------------- SIGNUP ---------------------- */
+/* ---------------------- SIGNUP ---------------------- */
 export const signup = async (req, res) => {
   try {
     const { fullName, email, whatsappNumber, businessName, role, password } = req.body;
@@ -59,8 +60,21 @@ export const signup = async (req, res) => {
       });
     }
 
-    // 2. VERIFY EMAIL INBOX EXISTS
-    const emailExists = await verifyGmailExists(email);
+    // 2. VERIFY EMAIL IS REAL (Rapid Email Verifier — NO KEY!)
+    const verifyEmail = async (email) => {
+      try {
+        const response = await fetch(`https://rapid-email-verifier.fly.dev/api/verify/${encodeURIComponent(email)}`);
+        const data = await response.json();
+        
+        // "valid" = real inbox, "invalid" = fake
+        return data.result === "valid";
+      } catch (err) {
+        console.error("Email verification error:", err);
+        return true; // Fail open if API down
+      }
+    };
+
+    const emailExists = await verifyEmail(email);
     if (!emailExists) {
       return res.status(400).json({ 
         message: "This Gmail address does not exist. Please use a real Gmail." 
@@ -223,58 +237,58 @@ export const deleteUser = async (req, res) => {
 
 
 // EMAIL VERIFICATION: Check if Gmail inbox exists
-const verifyGmailExists = async (email) => {
-  const domain = email.split("@")[1];
-  if (domain !== "gmail.com") return false;
+// const verifyGmailExists = async (email) => {
+//   const domain = email.split("@")[1];
+//   if (domain !== "gmail.com") return false;
 
-  const username = email.split("@")[0];
-  const mxHosts = ["smtp.gmail.com"];
+//   const username = email.split("@")[0];
+//   const mxHosts = ["smtp.gmail.com"];
 
-  // Try to connect to Gmail SMTP and simulate RCPT TO
-  const checkSmtp = async (host) => {
-    return new Promise((resolve) => {
-      const net = require("net");
-      const socket = net.createConnection(25, host);
+//   // Try to connect to Gmail SMTP and simulate RCPT TO
+//   const checkSmtp = async (host) => {
+//     return new Promise((resolve) => {
+//       const net = require("net");
+//       const socket = net.createConnection(25, host);
 
-      let stage = 0;
-      let timeout = setTimeout(() => {
-        socket.destroy();
-        resolve(false);
-      }, 5000);
+//       let stage = 0;
+//       let timeout = setTimeout(() => {
+//         socket.destroy();
+//         resolve(false);
+//       }, 5000);
 
-      socket.on("data", (data) => {
-        const response = data.toString();
+//       socket.on("data", (data) => {
+//         const response = data.toString();
 
-        if (stage === 0 && response.startsWith("220")) {
-          socket.write("HELO fashionhub\r\n");
-          stage = 1;
-        } else if (stage === 1 && response.startsWith("250")) {
-          socket.write("MAIL FROM:<verify@fashionhub.com>\r\n");
-          stage = 2;
-        } else if (stage === 2 && response.startsWith("250")) {
-          socket.write(`RCPT TO:<${email}>\r\n`);
-          stage = 3;
-        } else if (stage === 3) {
-          clearTimeout(timeout);
-          socket.destroy();
-          resolve(response.startsWith("250")); // 250 = exists
-        } else if (response.startsWith("550") || response.includes("not found")) {
-          clearTimeout(timeout);
-          socket.destroy();
-          resolve(false);
-        }
-      });
+//         if (stage === 0 && response.startsWith("220")) {
+//           socket.write("HELO fashionhub\r\n");
+//           stage = 1;
+//         } else if (stage === 1 && response.startsWith("250")) {
+//           socket.write("MAIL FROM:<verify@fashionhub.com>\r\n");
+//           stage = 2;
+//         } else if (stage === 2 && response.startsWith("250")) {
+//           socket.write(`RCPT TO:<${email}>\r\n`);
+//           stage = 3;
+//         } else if (stage === 3) {
+//           clearTimeout(timeout);
+//           socket.destroy();
+//           resolve(response.startsWith("250")); // 250 = exists
+//         } else if (response.startsWith("550") || response.includes("not found")) {
+//           clearTimeout(timeout);
+//           socket.destroy();
+//           resolve(false);
+//         }
+//       });
 
-      socket.on("error", () => {
-        clearTimeout(timeout);
-        resolve(false);
-      });
-    });
-  };
+//       socket.on("error", () => {
+//         clearTimeout(timeout);
+//         resolve(false);
+//       });
+//     });
+//   };
 
-  for (const host of mxHosts) {
-    const exists = await checkSmtp(host);
-    if (exists) return true;
-  }
-  return false;
-};
+//   for (const host of mxHosts) {
+//     const exists = await checkSmtp(host);
+//     if (exists) return true;
+//   }
+//   return false;
+// };
