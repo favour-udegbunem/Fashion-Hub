@@ -36,12 +36,32 @@ export const createOrder = async (req, res) => {
   }
 };
 
+// export const getAllOrders = async (req, res) => {
+//   try {
+//     const orders = await Order.findAll({ include: User });
+//     res.status(200).json(orders);
+//   } catch (error) {
+//     console.error("Error fetching orders:", error);
+//     res.status(500).json({ message: "Internal server error", error: error.message });
+//   }
+// };
+
 export const getAllOrders = async (req, res) => {
   try {
-    const orders = await Order.findAll({ include: User });
+    const userId = req.user.id; // ← ADD THIS
+
+    const orders = await Order.findAll({
+      where: { userId }, // ← ADD THIS
+      include: [
+        { model: User, attributes: ["fullName"] },
+        // ... other includes
+      ],
+      order: [["createdAt", "DESC"]],
+    });
+
     res.status(200).json(orders);
   } catch (error) {
-    console.error("Error fetching orders:", error);
+    console.error(error);
     res.status(500).json({ message: "Internal server error", error: error.message });
   }
 };

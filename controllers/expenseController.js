@@ -24,18 +24,19 @@ export const createExpense = async (req, res) => {
 };
 
 // Get All Expenses for User
-export const getUserExpenses = async (req, res) => {
+export const getAllExpenses = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user.id; // ← ADD THIS
 
     const expenses = await Expense.findAll({
-      where: { userId },
-      order: [["date", "DESC"]],
+      where: { userId }, // ← ADD THIS
+      order: [["createdAt", "DESC"]],
     });
 
     res.status(200).json(expenses);
   } catch (error) {
-    res.status(500).json({ message: "Failed to fetch expenses", error: error.message });
+    console.error(error);
+    res.status(500).json({ message: "Internal server error", error: error.message });
   }
 };
 
