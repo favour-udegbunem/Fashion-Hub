@@ -7,13 +7,71 @@ dotenv.config();
 const { User } = db;
 
 /* ---------------------- SIGNUP ---------------------- */
+// export const signup = async (req, res) => {
+//   try {
+//     const { fullName, email, whatsappNumber, businessName, role, password } = req.body;
+
+//     const existingUser = await User.findOne({ where: { email } });
+//     if (existingUser) return res.status(400).json({ message: "Email already in use" });
+
+//     const hashedPassword = await bcrypt.hash(password, 10);
+//     const whatsappLink = whatsappNumber ? `https://wa.me/${whatsappNumber.replace(/\D/g, "")}` : null;
+
+//     const user = await User.create({
+//       fullName,
+//       email,
+//       whatsappNumber,
+//       businessName,
+//       role: role || "Tailor",
+//       password: hashedPassword,
+//       whatsappLink,
+//     });
+
+//     const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: "7d" });
+
+//     res.status(201).json({
+//       message: "Signup successful",
+//       user: {
+//         id: user.id,
+//         fullName: user.fullName,
+//         email: user.email,
+//         businessName: user.businessName,
+//         role: user.role,
+//         whatsappLink: user.whatsappLink,
+//       },
+//       token,
+//     });
+//   } catch (error) {
+//     console.error("Signup error:", error);
+//     res.status(500).json({ message: "Internal server error", error: error.message });
+//   }
+// };
+
+/* ---------------------- SIGNUP ---------------------- */
 export const signup = async (req, res) => {
   try {
     const { fullName, email, whatsappNumber, businessName, role, password } = req.body;
 
+    // 1. MUST BE GMAIL
+    if (!email || !email.toLowerCase().endsWith('@gmail.com')) {
+      return res.status(400).json({ 
+        message: "Only Gmail accounts (@gmail.com) are allowed." 
+      });
+    }
+
+    // 2. VERIFY EMAIL INBOX EXISTS
+    const emailExists = await verifyGmailExists(email);
+    if (!emailExists) {
+      return res.status(400).json({ 
+        message: "This Gmail address does not exist. Please use a real Gmail." 
+      });
+    }
+
+    // 3. CHECK IF ALREADY REGISTERED
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) return res.status(400).json({ message: "Email already in use" });
 
+    // 4. CREATE USER
     const hashedPassword = await bcrypt.hash(password, 10);
     const whatsappLink = whatsappNumber ? `https://wa.me/${whatsappNumber.replace(/\D/g, "")}` : null;
 
@@ -161,4 +219,62 @@ export const deleteUser = async (req, res) => {
     console.error("Delete user error:", error);
     res.status(500).json({ message: "Failed to delete user", error: error.message });
   }
+};
+
+
+// EMAIL VERIFICATION: Check if Gmail inbox exists
+const verifyGmailExists = async (email) => {
+  const domain = email.split("@")[1];
+  if (domain !== "gmail.com") return false;
+
+  const username = email.split("@")[0];
+  const mxHosts = ["smtp.gmail.com"];
+
+  // Try to connect to Gmail SMTP and simulate RCPT TO
+  const checkSmtp = async (host) => {
+    return new Promise((resolve) => {
+      const net = require("net");
+      const socket = net.createConnection(25, host);
+
+      let stage = 0;
+      let timeout = setTimeout(() => {
+        socket.destroy();
+        resolve(false);
+      }, 5000);
+
+      socket.on("data", (data) => {
+        const response = data.toString();
+
+        if (stage === 0 && response.startsWith("220")) {
+          socket.write("HELO fashionhub\r\n");
+          stage = 1;
+        } else if (stage === 1 && response.startsWith("250")) {
+          socket.write("MAIL FROM:<verify@fashionhub.com>\r\n");
+          stage = 2;
+        } else if (stage === 2 && response.startsWith("250")) {
+          socket.write(`RCPT TO:<${email}>\r\n`);
+          stage = 3;
+        } else if (stage === 3) {
+          clearTimeout(timeout);
+          socket.destroy();
+          resolve(response.startsWith("250")); // 250 = exists
+        } else if (response.startsWith("550") || response.includes("not found")) {
+          clearTimeout(timeout);
+          socket.destroy();
+          resolve(false);
+        }
+      });
+
+      socket.on("error", () => {
+        clearTimeout(timeout);
+        resolve(false);
+      });
+    });
+  };
+
+  for (const host of mxHosts) {
+    const exists = await checkSmtp(host);
+    if (exists) return true;
+  }
+  return false;
 };
