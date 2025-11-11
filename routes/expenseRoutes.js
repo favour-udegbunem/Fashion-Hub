@@ -5,7 +5,6 @@ import {
   updateExpense,
   deleteExpense,
   getExpenseSummary,
-  getAllExpenses,
 } from "../controllers/expenseController.js";
 import { verifyToken } from "../middleware/authMiddleware.js";
 
