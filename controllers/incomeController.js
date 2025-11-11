@@ -52,7 +52,8 @@ export const getAllIncomes = async (req, res) => {
       where: { userId }, // ← ADD THIS
       include: [
         { model: User, attributes: ["id", "fullName", "email"] },
-        { model: Order, attributes: ["id", "orderNumber"] },
+        // { model: Order, attributes: ["id", "orderNumber"] },
+        { model: Order, attributes: ["id"] },
       ],
       order: [["createdAt", "DESC"]],
     });
