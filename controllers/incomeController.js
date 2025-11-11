@@ -69,7 +69,7 @@ export const getIncomeById = async (req, res) => {
 
     const income = await Income.findByPk(id, {
       include: [
-        { model: User, attributes: ["id", "name", "email"] },
+        { model: User, attributes: ["id", "fullName", "email"] },
         { model: Order, attributes: ["id", "orderNumber"] },
       ],
     });
