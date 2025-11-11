@@ -13,7 +13,7 @@ const router = express.Router();
 router.post("/CreateExpense", verifyToken, createExpense);
 router.get("/getAllExpenses", verifyToken, getUserExpenses);
 router.get("getExpenseSummary", verifyToken, getExpenseSummary)
-router.patch("/:id", verifyToken, updateExpense);
-router.delete("/:id", verifyToken, deleteExpense);
+router.patch("/expense/update/:id", verifyToken, updateExpense);
+router.delete("/expense/delete/:id", verifyToken, deleteExpense);
 
 export default router;
