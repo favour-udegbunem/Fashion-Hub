@@ -50,10 +50,10 @@ export const getAllIncomes = async (req, res) => {
 
     const incomes = await Income.findAll({
       where: { userId }, // ← ADD THIS
+      attributes: ["id", "description", "amount", "date", "paymentStatus", "orderId", "createdAt"],
       include: [
-        { model: User, attributes: ["id", "fullName", "email"] },
-        // { model: Order, attributes: ["id", "orderNumber"] },
-        { model: Order, attributes: ["id"] },
+        // { model: User, attributes: ["id", "fullName", "email"] },
+        // { model: Order, attributes: ["id"] },
       ],
       order: [["createdAt", "DESC"]],
     });
@@ -72,7 +72,8 @@ export const getUserIncomes = async (req, res) => {
 
     const incomes = await Income.findAll({
       where: { userId },
-      include: [{ model: Order, attributes: ["id", "orderNumber"] }],
+      attributes: ["id", "description", "amount", "date", "paymentStatus", "orderId", "createdAt"],
+      // include: [{ model: Order, attributes: ["id", "orderNumber"] }],
       order: [["createdAt", "DESC"]],
     });
 
