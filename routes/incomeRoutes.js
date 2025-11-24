@@ -5,6 +5,7 @@ import {
   getUserIncomes,
   getIncomeById,
   updateIncome,
+  updateIncomePaymentStatus,
   deleteIncome,
 } from "../controllers/incomeController.js";
 
@@ -16,6 +17,7 @@ router.post("/createIncome", verifyToken, createIncome);
 router.get("/getAllIncome", verifyToken, getAllIncomes); // admin view
 router.get("/user", verifyToken, getUserIncomes);
 router.get("/:id", verifyToken, getIncomeById);
+router.put("/updatePaymentStatus", verifyToken, updateIncomePaymentStatus);
 router.patch("/:id", verifyToken, updateIncome);
 router.delete("/:id", verifyToken, deleteIncome);
 

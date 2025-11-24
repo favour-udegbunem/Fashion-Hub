@@ -2,37 +2,37 @@ import db from "../models/index.js";
 const { Order, User, UserSelection } = db;
 
 // CREATE order
+// CREATE ORDER + AUTO ADD TO INCOME (PENDING)
 export const createOrder = async (req, res) => {
   try {
-    const { userId, customerName, dressType, amount, status, startDate, deadline } = req.body;
+    const { customerName, dressType, amount, startDate, deadline, status = "Pending" } = req.body;
+    const userId = req.user.id;
 
-    if (!userId || !customerName || !dressType || !amount || !startDate || !deadline) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
-
-    // Check if user exists
-    const user = await User.findByPk(userId);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
+    // 1. CREATE ORDER
     const order = await Order.create({
       userId,
       customerName,
       dressType,
       amount,
-      status,
       startDate,
       deadline,
+      status,
     });
 
-    res.status(201).json({
-      message: "Order created successfully",
-      order,
+    // 2. AUTO CREATE INCOME (PENDING)
+    await Income.create({
+      userId,
+      description: `Order Payment - ${customerName}'s ${dressType}`,
+      amount,
+      date: new Date().toISOString().split('T')[0],
+      paymentStatus: "Pending",
+      orderId: order.id,
     });
+
+    res.status(201).json({ message: "Order created + income pending", order });
   } catch (error) {
-    console.error("Error creating order:", error);
-    res.status(500).json({ message: "Internal server error", error: error.message });
+    console.error("Create order error:", error);
+    res.status(500).json({ message: "Failed", error: error.message });
   }
 };
 

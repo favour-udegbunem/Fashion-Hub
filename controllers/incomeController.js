@@ -73,7 +73,7 @@ export const getUserIncomes = async (req, res) => {
     const incomes = await Income.findAll({
       where: { userId },
       attributes: ["id", "description", "amount", "date", "paymentStatus", "orderId", "createdAt"],
-      // include: [{ model: Order, attributes: ["id", "orderNumber"] }],
+      include: [{ model: Order, attributes: ["id", "orderNumber"] }],
       order: [["createdAt", "DESC"]],
     });
 
@@ -125,6 +125,22 @@ export const updateIncome = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error", error: error.message });
+  }
+};
+
+export const updateIncomePaymentStatus = async (req, res) => {
+  try {
+    const { orderId, paymentStatus } = req.body;
+    const userId = req.user.id;
+
+    const income = await Income.findOne({ where: { orderId, userId } });
+    if (!income) return res.status(404).json({ message: "Income not found" });
+
+    await income.update({ paymentStatus });
+
+    res.status(200).json({ message: "Payment status updated", income });
+  } catch (error) {
+    res.status(500).json({ message: "Error", error: error.message });
   }
 };
 
