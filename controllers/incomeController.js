@@ -107,6 +107,34 @@ export const getIncomeById = async (req, res) => {
   }
 };
 
+// MARK INCOME AS PAID WHEN ORDER IS CONFIRMED
+export const markIncomeAsPaid = async (req, res) => {
+  try {
+    const { orderId } = req.body;
+    const userId = req.user.id;
+
+    const income = await Income.findOne({
+      where: { orderId, userId }
+    });
+
+    if (!income) {
+      return res.status(404).json({ message: "Income record not found for this order" });
+    }
+
+    await income.update({
+      paymentStatus: "Paid in Full"  // ← This matches your ENUM exactly
+    });
+
+    res.status(200).json({ 
+      message: "Payment confirmed! Income updated.", 
+      income 
+    });
+  } catch (error) {
+    console.error("markIncomeAsPaid error:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
 // Update Income
 export const updateIncome = async (req, res) => {
   try {
