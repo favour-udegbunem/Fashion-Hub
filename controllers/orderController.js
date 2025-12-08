@@ -25,7 +25,7 @@ export const createOrder = async (req, res) => {
       description: `Order Payment - ${customerName}'s ${dressType}`,
       amount,
       date: new Date().toISOString().split('T')[0],
-      paymentStatus: "Pending Payment",
+      paymentStatus: "Pending",
       orderId: order.id,
     });
 
