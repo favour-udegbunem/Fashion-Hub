@@ -1,38 +1,60 @@
 import db from "../models/index.js";
-const { Order, User, UserSelection } = db;
+const { Order, User, UserSelection, Income } = db;
 
 // CREATE order
-// CREATE ORDER + AUTO ADD TO INCOME (PENDING)
 export const createOrder = async (req, res) => {
   try {
+    console.log("createOrder called:", req.body);
+    console.log("User ID:", req.user?.id);
+
     const { customerName, dressType, amount, startDate, deadline, status = "Pending" } = req.body;
     const userId = req.user.id;
 
-    // 1. CREATE ORDER
+    if (!customerName || !dressType || !amount || !startDate || !deadline) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    // 1. CREATE ORDER ONLY — NO INCOME YET
     const order = await Order.create({
       userId,
-      customerName,
-      dressType,
-      amount,
+      customerName: customerName.trim(),
+      dressType: dressType.trim(),
+      amount: Number(amount),
       startDate,
       deadline,
       status,
     });
 
-    // 2. AUTO CREATE INCOME (PENDING)
-    await Income.create({
-      userId,
-      description: `Order Payment - ${customerName}'s ${dressType}`,
-      amount,
-      date: new Date().toISOString().split('T')[0],
-      paymentStatus: "Pending",
-      orderId: order.id,
+    console.log("Order created successfully:", order.id);
+
+    // 2. TRY TO CREATE INCOME — IF FAILS, STILL RETURN SUCCESS
+    try {
+      const Income = db.Income; // Make sure Income is imported
+      await Income.create({
+        userId,
+        description: `Order - ${customerName}`,
+        amount: Number(amount),
+        date: new Date().toISOString().split('T')[0],
+        paymentStatus: "Pending",  // ← THIS IS IN YOUR ENUM
+        orderId: order.id,
+      });
+      console.log("Income created for order:", order.id);
+    } catch (incomeError) {
+      console.error("Income failed (but order saved):", incomeError.message);
+      // DO NOT CRASH — ORDER IS STILL SAVED
+    }
+
+    res.status(201).json({
+      message: "Order created successfully",
+      order
     });
 
-    res.status(201).json({ message: "Order created + income pending", order });
   } catch (error) {
-    console.error("Create order error:", error);
-    res.status(500).json({ message: "Failed", error: error.message });
+    console.error("FATAL ERROR in createOrder:", error);
+    res.status(500).json({
+      message: "Server error",
+      error: error.message
+    });
   }
 };
 
