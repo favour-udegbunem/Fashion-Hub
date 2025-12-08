@@ -1,13 +1,14 @@
 import db from "../models/index.js";
 const { Order, User, UserSelection } = db;
 
-// CREATE ORDER + AUTO CREATE INCOME (PENDING)
+// CREATE order
+// CREATE ORDER + AUTO ADD TO INCOME (PENDING)
 export const createOrder = async (req, res) => {
   try {
     const { customerName, dressType, amount, startDate, deadline, status = "Pending" } = req.body;
     const userId = req.user.id;
 
-    // 1. CREATE THE ORDER
+    // 1. CREATE ORDER
     const order = await Order.create({
       userId,
       customerName,
@@ -18,24 +19,20 @@ export const createOrder = async (req, res) => {
       status,
     });
 
-    // 2. AUTO CREATE INCOME RECORD — THIS WAS MISSING!
+    // 2. AUTO CREATE INCOME (PENDING)
     await Income.create({
       userId,
-      description: `Order - ${customerName}'s ${dressType}`,
+      description: `Order Payment - ${customerName}'s ${dressType}`,
       amount,
-      date: new Date(),
-      paymentStatus: "Pending Payment",   // ← This is what Finance waits for
-      orderId: order.id
+      date: new Date().toISOString().split('T')[0],
+      paymentStatus: "Pending Payment",
+      orderId: order.id,
     });
 
-    res.status(201).json({
-      message: "Order created + income recorded",
-      order
-    });
-
+    res.status(201).json({ message: "Order created + income pending", order });
   } catch (error) {
     console.error("Create order error:", error);
-    res.status(500).json({ message: "Failed to create order", error: error.message });
+    res.status(500).json({ message: "Failed", error: error.message });
   }
 };
 

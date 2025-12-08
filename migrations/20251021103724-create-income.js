@@ -32,9 +32,16 @@ module.exports = {
         type: Sequelize.DATE,
         allowNull: false
       },
-      paymentStatus: {
-        type: Sequelize.ENUM("Paid in Full", "Partial Payment", "Pending Payment", "Deposit Recieved"),
-      },
+paymentStatus: {
+  type: Sequelize.ENUM(
+    "Pending Payment",
+    "Partial Payment", 
+    "Deposit Received",    // ← FIXED: Received, not Recieved
+    "Paid in Full"         // ← MUST BE EXACTLY THIS
+  ),
+  allowNull: false,
+  defaultValue: "Pending Payment"   // ← THIS IS CRITICAL
+},
       orderId: {
         type: Sequelize.UUID,
         references: {
