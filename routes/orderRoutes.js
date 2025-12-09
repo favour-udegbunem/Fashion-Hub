@@ -18,7 +18,7 @@ router.post("/createOrder", verifyToken, createOrder);
 router.get("/getAllOrders", verifyToken, getAllOrders);
 router.get("/getAllOrdersByDressType", verifyToken, getAllOrdersByDressType);
 router.put("/updateOrderStatus", verifyToken, updateOrderStatus)
-router.post("/confirm", verifyToken, confirmOrderPayment);
+router.post("/order/confirm", verifyToken, confirmOrderPayment);
 router.get("/:id", verifyToken, getOrderById);
 router.put("/:id", verifyToken, updateOrder);
 router.delete("/:id", verifyToken, deleteOrder);
