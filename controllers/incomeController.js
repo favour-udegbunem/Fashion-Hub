@@ -95,25 +95,47 @@ export const markIncomeAsPaid = async (req, res) => {
     const { orderId } = req.body;
     const userId = req.user.id;
 
-    const income = await Income.findOne({
-      where: { orderId, userId }
+    // Find the order
+    const order = await Order.findOne({
+      where: { id: orderId, userId }
     });
 
-    if (!income) {
-      return res.status(404).json({ message: "Income record not found for this order" });
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
     }
 
-    await income.update({
-      paymentStatus: "Paid in Full"  // ← This matches your ENUM exactly
-    });
+    // Check if income already exists
+    let income = await Income.findOne({ where: { orderId } });
+
+    if (income) {
+      // Already exists — update status
+      await income.update({ paymentStatus: "Paid in Full" });
+    } else {
+      // No income yet — CREATE IT
+      income = await Income.create({
+        userId,
+        description: `Payment - ${order.customerName}'s ${order.dressType}`,
+        amount: order.amount,
+        date: new Date().toISOString().split('T')[0],
+        paymentStatus: "Paid in Full",
+        orderId: order.id,
+      });
+    }
+
+    // Update order status to Completed
+    await order.update({ status: "Completed" });
 
     res.status(200).json({ 
-      message: "Payment confirmed! Income updated.", 
+      message: "Payment confirmed and income recorded!",
       income 
     });
+
   } catch (error) {
     console.error("markIncomeAsPaid error:", error);
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({ 
+      message: "Server error", 
+      error: error.message 
+    });
   }
 };
 
